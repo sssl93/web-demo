@@ -1,0 +1,27 @@
+- path: /generic-metrics
+  data:
+    - key: memory_used_mbs
+      help: The service memory used, unit MB.
+      value: 200
+      status: ok
+      node: hci1
+
+    - key: memory_used_mbs
+      help: The service memory used, unit MB.
+      value: 300
+      status: ok
+      node: hci2
+
+    - key: disk_used_gbs
+      help: The service disk used, unit GB.
+      value: 500
+      status: ok
+      node: hci2
+      disk: dva
+
+    - key: interface_received_bytes_total
+      help: Total bytes that network interface received, unit bytes.
+      value: 5000
+      status: ok
+      node: hci3
+      interface: eth0
