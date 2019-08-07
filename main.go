@@ -11,37 +11,36 @@ import (
 
 const VERSION = "v1.0.0"
 
-var configs []Config
-var pathMap = make(map[string]interface{})
-
 type Config struct {
 	Path string      `yaml:"path"`
 	Data interface{} `yaml:"data"`
 }
 
-func reloadConfigs(configPath string) {
+func getConfigs(configPath string) map[string]interface{} {
+	var sourceConfigs []Config
 	yamlFile, err := ioutil.ReadFile(configPath)
 
-	log.Println("yamlFile:", yamlFile)
 	if err != nil {
-		log.Printf("yamlFile.Get err #%v ", err)
+		log.Fatalf("yamlFile.Get err #%v ", err)
 	}
-	err = yaml.Unmarshal(yamlFile, &configs)
+	err = yaml.Unmarshal(yamlFile, &sourceConfigs)
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 	}
 
-	for _, config := range configs {
-		pathMap[config.Path] = config.Data
+	configs := make(map[string]interface{})
+	for _, config := range sourceConfigs {
+		configs[config.Path] = config.Data
 	}
+	return configs
 }
 
 func registerURL(configPath string, r *gin.Engine) {
-	reloadConfigs(configPath)
-	for path := range pathMap {
+	configs := getConfigs(configPath)
+	for path := range configs {
 		r.GET(path, func(c *gin.Context) {
-			reloadConfigs(configPath)
-			c.PureJSON(200, pathMap[path])
+			currentConfigs := getConfigs(configPath)
+			c.PureJSON(200, currentConfigs[path])
 		})
 	}
 }
